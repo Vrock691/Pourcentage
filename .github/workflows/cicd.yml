@@ -2,7 +2,7 @@ name: Flutter_Android
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build_android:
@@ -23,8 +23,11 @@ jobs:
           flutter-version: '2.0.1'
 
       - name: Create the Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          echo ${{ secrets.KEYSTORE_BASE64 }} | base64 -d > $RUNNER_TEMP/my_production.keystore
+          # import keystore from secrets
+          echo $KEYSTORE_BASE64 | base64 -d > $RUNNER_TEMP/my_production.keystore
 
       - name: Restore packages
         run: flutter pub get
@@ -33,7 +36,7 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Sign Android App Bundle
-        run: jarsigner -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD_ALIAS }} -sigalg SHA256withRSA -digestalg SHA-256 -signedjar build/app/outputs/bundle/release/app-release-signed.aab build/app/outputs/bundle/release/*.aab my_production_alias
+        run: jarsigner -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD_ALIAS }} -sigalg SHA256withRSA -digestalg SHA-256 -signedjar build/app/outputs/bundle/release/app-release-signed.aab build/app/outputs/bundle/release/*.aab YOUR_PRODUCTION_ALIAS
 
       - name: Publish Android Artefacts
         uses: actions/upload-artifact@v1
