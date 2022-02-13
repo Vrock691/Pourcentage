@@ -48,3 +48,4 @@ app.*.map.json
 # keystore files
 /upload-keystore.jks
 data.b64
+upload-keystoredata.b64
